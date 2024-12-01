@@ -1,0 +1,15 @@
+﻿FIRSTNAME,LASTNAME,MANAGER,DISPLAYNAME,MAIL,TITLE,LAST_LOGIN,ID
+James,Smith,1a2a3a,James.Smith,James.Smith@demoexample.com,IT Database Manager,2/17/2024,1a
+Mary,Johnson,1a,Mary.Johnson,Mary.Johnson@demoexample.com,Global Infrastructure Manager,2/18/2024,1a2a
+D'Arcy,O'Mahoney,1a,D'Arcy.O'Mahoney,D'Arcy.O'Mahoney@demoexample.com,Global Infrastructure Manager,2/19/2024,1a2aX
+John,Williams,1a,John.Williams,John.Williams@demoexample.com,Production Manager,2/20/2024,1a2b
+Patricia,Jones,1a,Patricia.Jones,Patricia.Jones@demoexample.com,Production Manager,2/21/2024,1a2c
+Robert,Brown,1a2a,Robert.Brown,Robert.Brown@demoexample.com,IT Database Manager,2/22/2024,1a2a3a
+Linda,Davis,1a2a,Linda.Davis,Linda.Davis@demoexample.com,Information Security Analyst,2/23/2024,1a2a3b
+Michael,Miller,1a2a,Michael.Miller,Michael.Miller@demoexample.com,Senior Production Manager,2/24/2024,1a2a3c
+Barbara,Wilson,1a2a,Barbara.Wilson,Barbara.Wilson@demoexample.com,Production Manager,2/25/2024,1a2a3d
+William,Moore,1a2b,William.Moore,William.Moore@demoexample.com,HR Manager,7/26/2024,1a2b3a
+Alexandrina,Irving,1a2b,Alexandrina Irving,Alexandrina123@yopmail.com,Training & Development Specialist,7/27/2024,1a2b3b
+Bobine,De Bellis,1a2b,Bobine De Bellis,Bobinetestuser@mail.com,Procurement Manager,7/28/2024,1a2b3c
+Herby,Tuting,1a2b,Herby Tuting,HerbyTuting@yopmail.com,Cost Savings Analyst,7/29/2024,1a2b3d
+Calli,Ludron,1a2c,Calli Ludron,Callitestuser@mail.com,Senior Finance Manager,7/30/2024,1a2c3a

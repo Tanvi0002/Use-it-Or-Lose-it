@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Prepare Remediations Workflow Launcher Rule">
+  <Description>Rule to Identify and store remediations to be performed for identities within specified applications</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Manage Remediations Rule Library"/>
+  </ReferencedRules>
+  <Source> 
+    
+    String PREPARE_REMEDIATIONS_WORKFLOW = "Prepare Remediations";
+    launchWorkflow(PREPARE_REMEDIATIONS_WORKFLOW);
+    
+  </Source>
+</Rule>

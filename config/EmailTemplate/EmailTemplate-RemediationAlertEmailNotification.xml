@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Remediation Alert Email Notification">
+  <Body>
+  
+    Hello,
+    
+    This email is to inform you that the access for $nativeIdentity within the application $application will be revoked as a part of the Use It or Lose It initiative where accesses are periodically checked and revoked due to extended inactivity within said application. 
+    Please use the Remediation Reversal module FAQ to request the lost access again. Also refer to the Deloitte Use it or Lose It FAQ to understand how the whole process works.
+    
+  </Body>
+  <Description>
+      Email Template for notifying revocation.
+    </Description>
+  <Subject>Use It or Lose It Revocation for $identityName within $application </Subject>
+</EmailTemplate>

@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Perform Remediations" type="Subprocess">
+  <Variable input="true" name="flow"/>
+  <Variable input="true" name="item"/>
+  <Variable initializer="true" name="trace"/>
+  <Variable name="identityRequestId"/>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Manage Remediations Rule Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="28" posY="27" wait="-1">
+    <Transition to="Check if reminder"/>
+  </Step>
+  <Step action="script:log.error(&quot;Start - Perform Remediation&quot;);" icon="Default" name="Check if reminder" posX="100" posY="28">
+    <Transition to="Create Remediation Provisioning Plan">
+      <Script>
+        <Source> 
+          log.error("hello...");
+          boolean returnValue = ifMaxThresholdBreached(item);
+          log.error("Max threshhold breached: " + returnValue);
+          return returnValue;
+        </Source>
+      </Script>
+    </Transition>
+    <Transition to="Remediation Alert Email Notification">
+      <Script>
+        <Source>
+          return true;
+        </Source>
+      </Script>
+    </Transition>
+  </Step>
+  <Step icon="Task" name="Create Remediation Provisioning Plan" posX="267" posY="25" resultVariable="plan">
+    <Script>
+      <Source>
+        log.error("Enter Step Create Remediation Provisioning Plan");
+        if ((item.get("revokeType")).equalsIgnoreCase("account")) {
+          log.error("Exit Step Create Remediation Provisioning Plan");
+          return (createAccountRevokePlan(item));
+        } else if((item.get("revokeType")).equalsIgnoreCase("access")) {
+          log.error("Exit Step Create Remediation Provisioning Plan");
+          return (createAccessRemovalPlan(item)); 
+        }
+        
+      </Source>
+    </Script>
+    <Transition to="Remediate"/>
+  </Step>
+  <Step icon="Email" name="Remediation Alert Email Notification" posX="166" posY="168">
+    <Script>
+      <Source> 
+        import sailpoint.object.EmailTemplate;
+        import sailpoint.object.EmailOptions;
+        import sailpoint.object.Identity;
+
+        EmailTemplate template = context.getObjectByName(EmailTemplate.class, "Remediation Alert Email Notification");
+        if (template != null) {
+          EmailOptions options = new EmailOptions();
+          Identity identity = context.getObjectByName(Identity.class, item.get("identityName"));
+          String emailId = identity.getEmail();
+          options.setTo(emailId);
+          options.setVariable("identityName",item.get("identityName"));
+          options.setVariable("nativeIdentity",item.get("nativeIdentity"));
+          options.setVariable("application",item.get("applicationName"));
+          context.sendEmailNotification(template, options);  
+        } else{
+          log.error("Email Template not found.");
+        }
+      </Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Task" name="Remediate" posX="412" posY="28">
+    <Arg name="identityEmailTemplate"/>
+    <Arg name="enableRetryRequest"/>
+    <Arg name="securityOfficerElectronicSignature"/>
+    <Arg name="fallbackApprover"/>
+    <Arg name="endOnManualWorkItems"/>
+    <Arg name="userEmailTemplate"/>
+    <Arg name="policiesToCheck"/>
+    <Arg name="project"/>
+    <Arg name="workItemComments"/>
+    <Arg name="identityRequestId"/>
+    <Arg name="approvalSplitPoint"/>
+    <Arg name="source"/>
+    <Arg name="identityDisplayName"/>
+    <Arg name="foregroundProvisioning" value="false"/>
+    <Arg name="ownerElectronicSignature"/>
+    <Arg name="batchRequestItemId"/>
+    <Arg name="saveUnmanagedPlan_WithProjectArgument"/>
+    <Arg name="splitPlans"/>
+    <Arg name="doRefresh"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="identityElectronicSignature"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="approvalSet"/>
+    <Arg name="violationReviewDecision"/>
+    <Arg name="filterRejects"/>
+    <Arg name="splitProjects"/>
+    <Arg name="requireCommentsForDenial"/>
+    <Arg name="requesterEmailTemplate"/>
+    <Arg name="approvalEmailTemplate"/>
+    <Arg name="ticketManagementApplication"/>
+    <Arg name="securityOfficerName"/>
+    <Arg name="approvingIdentities"/>
+    <Arg name="managerEmailTemplate"/>
+    <Arg name="ticketId"/>
+    <Arg name="approvalScheme" value="none"/>
+    <Arg name="allowRequestsWithViolations"/>
+    <Arg name="workItemPriority"/>
+    <Arg name="managerElectronicSignature"/>
+    <Arg name="requireViolationReviewComments"/>
+    <Arg name="splitApprovalSet"/>
+    <Arg name="approvalMode"/>
+    <Arg name="trace"/>
+    <Arg name="endOnProvisioningForms"/>
+    <Arg name="splitWorkItemComments"/>
+    <Arg name="requireCommentsForApproval"/>
+    <Arg name="notificationScheme"/>
+    <Arg name="policyViolations"/>
+    <Arg name="policyScheme"/>
+    <Arg name="setPreviousApprovalDecisions"/>
+    <Arg name="optimisticProvisioning"/>
+    <Arg name="securityOfficerEmailTemplate"/>
+    <Return name="identityRequestId"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="LCM Provisioning Remediation"/>
+    </WorkflowRef>
+    <Transition to="Update custom table"/>
+  </Step>
+  <Step icon="Default" name="Update custom table" posX="578" posY="25">
+    <Script>
+      <Source>  
+        log.error("In step Update custom table");
+        updateRemediationStatus("Completed",item);</Source>
+    </Script>
+    <Transition to="Audit"/>
+  </Step>
+  <Step icon="Audit" name="Audit" posX="695" posY="26">
+    <Script>
+      <Source> 
+        Map map = new HashMap();
+        map.put("Access Request",identityRequestId);
+        map.put("Requester",launcher);
+        map.put("identityName",item.get("identityName"));
+        map.put("ProvisioningPlan",plan.toXml());
+        logAudit(flow,flow,item.get("identityName"),item.get("applicationName"),item.get("revokeType"),item.get("nativeIdentity"),item.get("entitlementAttributeName"),item.get("entitlementAttributeValue"),map);
+      </Source>
+    </Script>
+    <Transition to="Remediation Completion Email Notification"/>
+  </Step>
+  <Step icon="Email" name="Remediation Completion Email Notification" posX="831" posY="24">
+    <Script>
+      <Source> 
+        import sailpoint.object.EmailTemplate;
+        import sailpoint.object.EmailOptions;
+        import sailpoint.object.Identity;
+
+        EmailTemplate template = context.getObjectByName(EmailTemplate.class, "Remediation Completion Email Notification");
+        if(template != null)
+        {
+        EmailOptions options = new EmailOptions();
+        Identity identity = context.getObjectByName(Identity.class, item.get("identityName"));
+        String emailId = identity.getEmail();
+        options.setTo(emailId);
+        options.setVariable("identityName",item.get("identityName"));
+        options.setVariable("nativeIdentity",item.get("nativeIdentity"));
+        options.setVariable("application",item.get("applicationName"));
+        context.sendEmailNotification(template, options);  
+        }
+        else
+        {
+        log.error("Email Template not found.");
+        }
+      </Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="832" posY="166"/>
+</Workflow>

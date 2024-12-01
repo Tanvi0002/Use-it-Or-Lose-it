@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Remediation Reversal Completion Email Notification">
+  <Body>
+	
+    Hello,
+    
+    This email is to inform you that the revoked access/account for $nativeIdentity within the application $application has been reversed as a part of the Use It or Lose It Initiative. This means you have submitted a request to re-instate the access or account within the application and the request has been successfully completed. 
+    Please use the Remediation Reversal module FAQ to request the lost access again. Also refer to the Deloitte Use it or Lose It FAQ to understand how the whole process works.
+    
+  </Body>
+  <Description>
+      Email Template for notifying Remediation Reversal Completion.
+    </Description>
+  <Subject>Use It or Lose It Remediation Reversal Complete for $identityName within $application </Subject>
+</EmailTemplate>

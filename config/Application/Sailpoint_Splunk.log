@@ -1,0 +1,136 @@
+09/13/2024 08:00:00, UserID_001, Login
+09/13/2024 08:10:30, UserID_001, Usage, Viewed Dashboard
+09/13/2024 08:20:15, UserID_001, Usage, Updated Profile
+09/13/2024 08:35:45, UserID_001, SailPoint1, Test__c1, Test_Access_c1,Last Login: 2024-07-09 08:00:00
+09/13/2024 08:00:00, UserID_001, Login
+09/13/2024 08:10:30, UserID_001, Usage, Viewed Dashboard
+09/13/2024 08:20:15, UserID_001, Usage, Updated Profile
+09/13/2024 08:45:25, UserID_001, Logout, SailPoint1, Last Login: 2024-07-09 08:05:00
+09/13/2024 08:05:00, UserID_002, Login
+09/13/2024 08:15:10, UserID_002, Usage, Uploaded Document
+09/13/2024 08:30:45, UserID_002, Usage, Edited Document
+09/13/2024 08:45:25, UserID_002, SailPoint1, Test__c1, Test_Access_c1, Last Login: 09/13/2024 08:05:00
+09/13/2024 08:15:10, UserID_002, Usage, Uploaded Document
+09/13/2024 08:30:45, UserID_002, Usage, Edited Document
+09/13/2024 08:45:25, UserID_002, Logout, SailPoint1, Last Login: 09/13/2024 08:05:00
+09/13/2024 08:10:00, UserID_003, Login
+09/13/2024 08:25:35, UserID_003, Usage, Accessed Reports
+09/13/2024 08:40:00, UserID_003, Usage, Generated Report
+09/13/2024 08:45:25, UserID_003, SailPoint1, Test__c3, Test_Access_c3, Last Login: 09/13/2024 08:05:00
+09/13/2024 08:25:35, UserID_003, Usage, Accessed Reports
+09/13/2024 08:40:00, UserID_003, Usage, Generated Report
+09/13/2024 08:55:55, UserID_003, Logout, SailPoint1, Last Login: 09/13/2024 08:10:00
+09/13/2024 09:00:00, UserID_004, Login
+09/13/2024 09:10:20, UserID_004, Usage, Viewed Notifications
+09/13/2024 09:25:15, UserID_004, Usage, Marked Notifications as Read
+09/13/2024 09:40:00, UserID_004, Logout, SailPoint1, Last Login: 09/13/2024 09:00:00
+09/13/2024 09:10:20, UserID_004, Usage, Viewed Notifications
+09/13/2024 09:25:15, UserID_004, Usage, Marked Notifications as Read
+09/13/2024 08:45:25, UserID_004, SailPoint1, Test__c2, Test_Access_c4, Last Login: 09/13/2024 08:05:00
+09/13/2024 09:05:00, UserID_005, Login
+09/13/2024 09:20:35, UserID_005, Usage, Started Project
+09/13/2024 09:35:00, UserID_005, Usage, Edited Project Details
+09/13/2024 09:50:25, UserID_005, Logout, SailPoint1, Last Login: 09/13/2024 09:05:00
+09/13/2024 09:20:35, UserID_005, Usage, Started Project
+09/13/2024 09:35:00, UserID_005, Usage, Edited Project Details
+09/13/2024 08:45:25, UserID_005, SailPoint1, Test__c2, Test_Access_c5, Last Login: 09/13/2024 08:05:00
+09/13/2024 09:10:00, UserID_006, Login
+09/13/2024 09:25:45, UserID_006, Usage, Scheduled Meeting
+09/13/2024 09:40:30, UserID_006, Usage, Joined Meeting
+09/13/2024 09:55:15, UserID_006, Logout, SailPoint1, Last Login: 09/13/2024 09:10:00
+09/13/2024 09:25:45, UserID_006, Usage, Scheduled Meeting
+09/13/2024 09:40:30, UserID_006, Usage, Joined Meeting
+09/13/2024 08:45:25, UserID_006, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 10:00:00, UserID_007, Login
+09/13/2024 10:15:30, UserID_007, Usage, Created Task
+09/13/2024 10:30:00, UserID_007, Usage, Updated Task Status
+09/13/2024 10:45:25, UserID_007, Logout, SailPoint1, Last Login: 09/13/2024 10:00:00
+09/13/2024 10:15:30, UserID_007, Usage, Created Task
+09/13/2024 10:30:00, UserID_007, Usage, Updated Task Status
+09/13/2024 08:45:25, UserID_007, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 10:05:00, UserID_008, Login
+09/13/2024 10:20:45, UserID_008, Usage, Reviewed Project
+09/13/2024 10:35:15, UserID_008, Usage, Added Comments
+09/13/2024 10:50:00, UserID_008, Logout, SailPoint1, Last Login: 09/13/2024 10:05:00
+09/13/2024 10:20:45, UserID_008, Usage, Reviewed Project
+09/13/2024 10:35:15, UserID_008, Usage, Added Comments
+09/13/2024 08:45:25, UserID_008, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 10:10:00, UserID_009, Login
+09/13/2024 10:25:30, UserID_009, Usage, Sent Message
+09/13/2024 10:40:00, UserID_009, Usage, Received Message
+09/13/2024 10:55:25, UserID_009, Logout, SailPoint1, Last Login: 09/13/2024 10:10:00
+09/13/2024 10:25:30, UserID_009, Usage, Sent Message
+09/13/2024 10:40:00, UserID_009, Usage, Received Message
+09/13/2024 08:45:25, UserID_009, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 11:00:00, UserID_010, Login
+09/13/2024 11:15:30, UserID_010, Usage, Edited Profile
+09/13/2024 11:30:00, UserID_010, Usage, Changed Password
+09/13/2024 11:45:25, UserID_010, Logout, SailPoint1, Last Login: 09/13/2024 11:00:00
+09/13/2024 11:15:30, UserID_010, Usage, Edited Profile
+09/13/2024 11:30:00, UserID_010, Usage, Changed Password
+09/13/2024 08:45:25, UserID_010, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 11:05:00, UserID_011, Login
+09/13/2024 11:20:35, UserID_011, Usage, Viewed Dashboard
+09/13/2024 11:35:00, UserID_011, Usage, Exported Data
+09/13/2024 11:50:25, UserID_011, Logout, SailPoint1, Last Login: 09/13/2024 11:05:00
+09/13/2024 11:20:35, UserID_011, Usage, Viewed Dashboard
+09/13/2024 11:35:00, UserID_011, Usage, Exported Data
+09/13/2024 08:45:25, UserID_011, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 11:10:00, UserID_012, Login
+09/13/2024 11:25:30, UserID_012, Usage, Uploaded File
+09/13/2024 11:40:00, UserID_012, Usage, Deleted File
+09/13/2024 11:55:25, UserID_012, Logout, SailPoint1, Last Login: 09/13/2024 11:10:00
+09/13/2024 11:25:30, UserID_012, Usage, Uploaded File
+09/13/2024 11:40:00, UserID_012, Usage, Deleted File
+09/13/2024 08:45:25, UserID_012, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 12:00:00, UserID_013, Login
+09/13/2024 12:15:30, UserID_013, Usage, Created Report
+09/13/2024 12:30:00, UserID_013, Usage, Edited Report
+09/13/2024 12:45:25, UserID_013, Logout, SailPoint1, Last Login: 09/13/2024 12:00:00
+09/13/2024 12:15:30, UserID_013, Usage, Created Report
+09/13/2024 12:30:00, UserID_013, Usage, Edited Report
+09/13/2024 08:45:25, UserID_013, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 12:05:00, UserID_014, Login
+09/13/2024 12:20:35, UserID_014, Usage, Scheduled Event
+09/13/2024 12:35:00, UserID_014, Usage, Cancelled Event
+09/13/2024 12:50:25, UserID_014, Logout, SailPoint1, Last Login: 09/13/2024 12:05:00
+09/13/2024 12:20:35, UserID_014, Usage, Scheduled Event
+09/13/2024 12:35:00, UserID_014, Usage, Cancelled Event
+09/13/2024 08:45:25, UserID_014, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 12:10:00, UserID_015, Login
+09/13/2024 12:25:30, UserID_015, Usage, Added Comment
+09/13/2024 12:40:00, UserID_015, Usage, Edited Comment
+09/13/2024 12:55:25, UserID_015, Logout, SailPoint1, Last Login: 09/13/2024 12:10:00
+09/13/2024 12:25:30, UserID_015, Usage, Added Comment
+09/13/2024 12:40:00, UserID_015, Usage, Edited Comment
+09/13/2024 08:45:25, UserID_015, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 12:25:30, UserID_015, Usage, Added Comment
+09/13/2024 12:40:00, UserID_015, Usage, Edited Comment
+09/13/2024 13:00:00, UserID_016, Login
+09/13/2024 13:15:30, UserID_016, Usage, Created Task
+09/13/2024 13:30:00, UserID_016, Usage, Completed Task
+09/13/2024 13:45:25, UserID_016, Logout, SailPoint1, Last Login: 09/13/2024 13:00:00
+09/13/2024 13:15:30, UserID_016, Usage, Created Task
+09/13/2024 13:30:00, UserID_016, Usage, Completed Task
+09/13/2024 08:45:25, UserID_016, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 13:05:00, UserID_017, Login
+09/13/2024 13:20:35, UserID_017, Usage, Edited Document
+09/13/2024 13:35:00, UserID_017, Usage, Reviewed Comments
+09/13/2024 13:50:25, UserID_017, Logout,SailPoint1, Last Login: 09/13/2024 13:05:00
+09/13/2024 13:20:35, UserID_017, Usage, Edited Document
+09/13/2024 13:35:00, UserID_017, Usage, Reviewed Comments
+09/13/2024 08:45:25, UserID_017, SailPoint1, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 13:10:00, UserID_018, Login
+09/13/2024 13:25:30, UserID_018, Usage, Uploaded File
+09/13/2024 13:40:00, UserID_018, Usage, Shared File
+09/13/2024 13:55:25, UserID_018, Logout,SailPoint1, Last Login: 09/13/2024 13:10:00
+09/13/2024 13:25:30, UserID_018, Usage, Uploaded File
+09/13/2024 13:40:00, UserID_018, Usage, Shared File
+09/13/2024 08:45:25, UserID_018, SailPoint2, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00
+09/13/2024 14:00:00, UserID_019, Login
+09/13/2024 14:15:30, UserID_019, Usage, Viewed Analytics
+09/13/2024 14:30:00, UserID_019, Usage, Exported Report
+09/13/2024 14:45:25, UserID_019, Logout,SailPoint1, Last Login: 09/13/2024
+09/13/2024 14:15:30, UserID_019, Usage, Viewed Analytics
+09/13/2024 14:30:00, UserID_019, Usage, Exported Report
+09/13/2024 08:45:25, UserID_019, SailPoint2, Test__c2, Test_Access_c6, Last Login: 09/13/2024 08:05:00

@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Org-Rule-Access-Dormant_Access_Remediation">
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="application">
+        <Description>Name of the application.</Description>
+      </Argument>
+      <Argument name="objectType">
+        <Description>Possible values: 
+          1. Account
+          2.Access</Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="recordMap"/>
+    </Returns>
+  </Signature>
+  <Source>
+  
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Link;
+
+
+  Map recordMap = new HashMap();
+  QueryOptions queryOptions = new QueryOptions();
+  queryOptions.addFilter(Filter.eq("application.name", application));
+
+  Iterator linkItr = context.search(Link.class, queryOptions);
+  while (linkItr.hasNext()) {
+    linkObj = linkItr.next();
+    List listOfGroupLastUsageInfo = linkObj.getAttribute("groupLastUsageInfo");
+
+    for(String groupInfo : listOfGroupLastUsageInfo){
+
+      List&lt;String&gt; listOfStr = Arrays.asList(groupInfo.split("##", 2));
+
+      String str = linkObj.getAttribute("email") +"##"+"groups"+"##"+listOfStr.get(0);
+      recordMap.put(str,listOfStr.get(1));
+
+    }
+
+  }
+  log.error("returning recordMap: "+ recordMap);
+  return recordMap;
+      
+  </Source>
+</Rule>

@@ -1,0 +1,178 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Remediation Reversal Form" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="includeHiddenFields" value="true"/>
+      <entry key="pageTitle" value="Manage Remediations"/>
+    </Map>
+  </Attributes>
+  <Section name="Select Remediation for reversal">
+    <Field displayName="User Name" displayType="combobox" helpKey="Select the user" name="userName" postBack="true" required="true" type="sailpoint.object.Identity">
+      <Attributes>
+        <Map>
+          <entry key="filterString">
+            <value>
+              <Script>
+                <Source>
+                  
+                    import sailpoint.object.Filter;
+                    import sailpoint.object.Identity;
+                    
+                    Identity requesterIdentity = context.getObjectByName(Identity.class, requester);
+                    if (requesterIdentity != null &amp;&amp; !requesterIdentity.getCapabilityManager().hasCapability("SystemAdministrator")) {
+                        Filter filter = null;
+                        if (requesterIdentity.getManagerStatus()) {
+                            filter = Filter.or(Filter.and(Filter.notnull("manager"), Filter.eq("manager.name", requester)), Filter.eq("name", requester));
+                        } else {
+                            filter = Filter.eq("name", requester);                    
+                        }
+                        field.setFilterString(filter.toString());
+                    }
+                  
+                </Source>
+              </Script>
+            </value>
+          </entry>
+          <entry key="valueProperty" value="name"/>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source>
+          
+            import sailpoint.object.Identity;
+            
+            Identity requesterIdentity = context.getObjectByName(Identity.class, requester);
+            if (requesterIdentity != null &amp;&amp; !requesterIdentity.getCapabilityManager().hasCapability("SystemAdministrator") @and !requesterIdentity.getManagerStatus()) {
+                form.getField("userName").setValue(requester);
+                form.getField("userName").setReadOnly(true);
+            }
+          
+        </Source>
+      </Script>
+    </Field>
+    <Field dependencies="userName" displayName="Remediation Type" dynamic="true" helpKey="Select the remediation type" name="revokeType" postBack="true" required="true">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+            
+              return Arrays.asList(new String[] { "Account", "Access" });
+            
+          </Source>
+        </Script>
+      </AllowedValuesDefinition>
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source>
+                  
+                    if (userName != void &amp;&amp; userName != null) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                  
+                </Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field dependencies="userName,revokeType" displayName="Account / Access to be reversed" displayType="combobox" dynamic="true" helpKey="Select Account / Access to be reversed" name="itemToBeReversed" required="true" type="string">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+            
+                import sailpoint.object.Form;
+                import sailpoint.tools.GeneralException;
+                import sailpoint.tools.Util;                
+
+                List&lt;String&gt; remediationList = new ArrayList&lt;String&gt;();
+                Iterator remediationLogItr = null;
+                try {
+                    if (userName != void &amp;&amp; userName != null &amp;&amp; revokeType != void &amp;&amp; revokeType != null) {
+                        String sqlStatement = "SELECT revokeType,nativeIdentity,applicationName,entitlementAttributeName,entitlementAttributeValue FROM identityiq.custom_remediation_log where remediationStatus='Completed' AND identityName = '" + userName + "'" + " AND revokeType='" + revokeType + "'";
+                        remediationLogItr = context.search("sql:" + sqlStatement, null,null);
+                        Object[] row = null;
+                        while (remediationLogItr.hasNext()) {
+                            row = remediationLogItr.next();
+                            if("Account".equals(revokeType)) {
+                                remediationList.add("Dormant " + Util.otos(row[0]) + " '" + Util.otos(row[1]) + "' revoked on application '" + Util.otos(row[2]) + "'");
+                                form.setFieldValue("nativeIdentity",Util.otos(row[1]));
+                                form.setFieldValue("applicationName",Util.otos(row[2]));
+                            } else if ("Access".equals(revokeType)) {
+                                remediationList.add("Dormant " + Util.otos(row[0]) + " { " + Util.otos(row[3]) + " : " + Util.otos(row[4]) + " } revoked for account " + Util.otos(row[1]) + " on application " + Util.otos(row[2]) + "'");
+                                form.setFieldValue("nativeIdentity",Util.otos(row[1]));
+                                form.setFieldValue("applicationName",Util.otos(row[2]));
+                                form.setFieldValue("entitlementAttributeName",Util.otos(row[3]));
+                                form.setFieldValue("entitlementAttributeValue",Util.otos(row[4]));
+                            }
+                        }
+                    }                    
+                } catch(GeneralException ex) {
+                    log.error("Error in form : " +ex.getMessage());
+                } finally {
+                    if (remediationLogItr != null) {
+                        Util.flushIterator(remediationLogItr);
+                    }                
+                }
+                return remediationList;
+            
+          </Source>
+        </Script>
+      </AllowedValuesDefinition>
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source>
+                  
+                    if (revokeType != void &amp;&amp; revokeType != null) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                  
+                </Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field dynamic="true" name="nativeIdentity">
+      <Attributes>
+        <Map>
+          <entry key="hidden" value="true"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field dynamic="true" name="applicationName">
+      <Attributes>
+        <Map>
+          <entry key="hidden" value="true"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field dynamic="true" name="entitlementAttributeName">
+      <Attributes>
+        <Map>
+          <entry key="hidden" value="true"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field dynamic="true" name="entitlementAttributeValue">
+      <Attributes>
+        <Map>
+          <entry key="hidden" value="true"/>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+  <Button action="next" label="Submit"/>
+  <Button action="cancel" label="Cancel"/>
+</Form>

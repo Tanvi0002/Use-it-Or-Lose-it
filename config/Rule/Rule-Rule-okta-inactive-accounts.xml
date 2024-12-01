@@ -1,0 +1,284 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Rule-Okta-Inactive-Accounts">
+  <Source>
+
+  import java.util.ArrayList;
+  import java.util.List;
+  import org.apache.log4j.Logger;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Identity;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Util;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.api.SailPointFactory;
+  import sailpoint.api.Terminator;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.WorkflowCase;
+  import sailpoint.api.PasswordGenerator;
+  import sailpoint.object.Attributes;
+  import javax.faces.application.FacesMessage;
+  import javax.faces.context.FacesContext;
+  import javax.servlet.http.HttpSession;
+  import org.primefaces.context.PrimeFacesContext;
+  import sailpoint.object.Workflow;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Request;
+  import sailpoint.object.RequestDefinition;
+  import sailpoint.object.Attributes;
+  import sailpoint.workflow.StandardWorkflowHandler;
+  import sailpoint.api.RequestManager;
+  import sailpoint.connector.Connector;
+  import sailpoint.connector.ConnectorFactory;
+  import sailpoint.object.Identity;
+  import sailpoint.object.IdentitySelector;  
+  import sailpoint.object.Application;
+  import java.time.ZonedDateTime;
+  import java.time.format.DateTimeFormatter;
+  import sailpoint.object.Workflow;
+  import sailpoint.object.Identity;
+  import sailpoint.tools.GeneralException;;
+  import sailpoint.object.IdentityTrigger;
+  import sailpoint.object.ProvisioningTransaction;
+  import sailpoint.connector.webservices.WebServicesClient;
+  import sailpoint.integration.RestClient;
+  import org.apache.http.HttpEntity;
+  import org.apache.http.Header;
+  import org.apache.http.HttpResponse;
+  import org.apache.http.client.methods.HttpGet;
+  import org.apache.http.client.methods.HttpPost;
+  import org.apache.http.entity.StringEntity;
+  import org.apache.http.impl.client.CloseableHttpClient;
+  import org.apache.http.impl.client.HttpClientBuilder;
+  import org.apache.http.util.EntityUtils;
+  import org.json.JSONObject;
+  import org.json.simple.parser.JSONParser;
+  import sailpoint.integration.JsonUtil;
+
+  String logger = "UseItOrLoseIt: Okta Disable Accounts3 ==&gt; ";
+
+  Object callSingleAPI(String oktaApiToken, String url){
+   // log.error(logger+"method started");
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    HttpGet getRequest = new HttpGet(url);
+    getRequest.addHeader("Accept", "application/json");
+    getRequest.addHeader("Content-Type", "application/json");
+    getRequest.addHeader("Authorization", "SSWS "+oktaApiToken);
+  //  log.error(logger+"Http get header"+ getRequest);
+    HttpResponse getResponse = httpClient.execute(getRequest);
+  //  log.error(logger+"getResponse statusline: "+getResponse.getStatusLine().toString());
+
+    HttpEntity getResponseEntity = getResponse.getEntity();
+    if(getResponse.getStatusLine().toString().contains("200") @and getResponseEntity!=null) {
+      Object responseObject = JsonUtil.parse(EntityUtils.toString(getResponseEntity));
+      return responseObject;
+    }
+  }
+
+  Object callListAPI(String oktaApiToken, String url){
+    int runCount = 0;
+    String nextUrl = url;
+    boolean isNextUrl = false;
+    List responseList = new ArrayList();
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    do{
+      isNextUrl = false;
+     // log.error(logger+"In loop");
+      HttpGet getRequest = new HttpGet(nextUrl);
+      getRequest.addHeader("Accept", "application/json");
+      getRequest.addHeader("Content-Type", "application/json");
+      getRequest.addHeader("Authorization", "SSWS "+oktaApiToken);
+
+      HttpResponse getResponse = httpClient.execute(getRequest);
+
+      Header[] headers = getResponse.getAllHeaders();
+      for(Header header : headers) {
+        if(header.getValue().contains("rel=\"next\"")){
+          isNextUrl = true;
+          nextUrl = (String)header.getValue();
+          nextUrl = nextUrl.substring(nextUrl.indexOf("&lt;")+1);
+          nextUrl = nextUrl.substring(0,nextUrl.indexOf("&gt;"));
+        //  log.error(logger+"Http next URL==&gt;"+ nextUrl);
+        }
+      }
+      HttpEntity getResponseEntity = getResponse.getEntity();
+      if(getResponse.getStatusLine().toString().contains("200") @and getResponseEntity!=null) {
+        Object responseObject = JsonUtil.parse(EntityUtils.toString(getResponseEntity));
+      //  log.error(logger+"Http Indivdial Response==&gt;"+ responseObject);
+        responseList.addAll((List)responseObject);
+      //  log.error(logger+"Http full Response==&gt;"+ responseList);
+      }
+      runCount++;
+    } while(runCount &lt; 10);
+   // } while(nextUrl != null @and isNextUrl);
+    return (Object)responseList;
+  }
+
+  Map processApplicationData(Object obj){
+    List userMap = (List)obj;
+    Map result = new HashMap();
+    String applicationId = null;
+    List firstMap = (List)userMap.get(0).get("target");
+    for(Map map:firstMap){
+      if(map.get("type").equalsIgnoreCase("AppInstance"))
+        applicationId = map.get("id");
+    }
+    if(Util.isNotNullOrEmpty(applicationId))
+      result.put("applicationId",applicationId);
+
+    for(Map map:userMap){
+      if(!result.containsKey(map.get("actor").get("id").toString())){
+        String key = (String)map.get("actor").get("id");
+        ZonedDateTime zone = ZonedDateTime.parse(map.get("published").toString());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        String value = zone.format(formatter);
+        result.put(key,value);
+      }
+    }
+    return result;
+  }
+
+  Object getAllUsersforApplication(Map nativeIdentityDetails,String baseUrl, String auth,String scope){
+    String customName = "Custom-Use_It_Or_Lose_It_Configuration";
+    Custom userItOrLoseitCustom = context.getObjectByName(Custom.class,customName);
+    if(null != userItOrLoseitCustom){
+      Attributes attributes = userItOrLoseitCustom.getAttributes();
+      Map usersWithLastLogin = (Map)nativeIdentityDetails;
+      String applicationId = usersWithLastLogin.get("applicationId");
+      String url = baseUrl+attributes.get("Okta_Details").get("getAllUserForApplicationPreURL").toString()+applicationId+attributes.get("Okta_Details").get("getAllUserForApplicationPostURL").toString();
+
+      //Generate a resultSet Map
+      Map resultMap = new HashMap();
+
+      //Calling All user API for particular applicationId
+      Object resultAPI = callListAPI(auth,url);
+
+      //Converting data into from Object to List
+      List applicationUsers = (List)resultAPI;
+
+      for(Map eachUserMap : applicationUsers){
+        if(nativeIdentityDetails.containsKey(eachUserMap.get("id"))){
+          if(eachUserMap.get("status").equalsIgnoreCase("ACTIVE")){
+            if(eachUserMap.get("scope").equalsIgnoreCase(scope) @and "USER".equalsIgnoreCase(scope)){
+              resultMap.put(eachUserMap.get("id"),nativeIdentityDetails.get(eachUserMap.get("id")));
+            }
+            if(eachUserMap.get("scope").equalsIgnoreCase(scope) @and "GROUP".equalsIgnoreCase(scope)){
+              String groupUrl = eachUserMap.get("_links").get("group");
+              if(Util.isNotNullOrEmpty(groupUrl)){
+                Map resultGroupMap = (Map)callSingleAPI(auth,groupUrl);
+                if(resultGroupMap.get("type").equalsIgnoreCase("OKTA_GROUP")){
+                  String key = eachUserMap.get("id")+"##groups##"+resultGroupMap.get("id");
+                  resultMap.put(key,nativeIdentityDetails.get(eachUserMap.get("id")));
+                }
+                if(resultGroupMap.get("type").equalsIgnoreCase("APP_GROUP")){
+                  List objectClass = (List)resultGroupMap.get("objectClass");
+                  if(objectClass.contains("okta:windows_security_principal")){
+                    String email = getEmailsOfUsers(eachUserMap.get("id"),baseUrl,auth);
+                    String key = getAdNativeIdentityFromEmail(email)+"##memberOf##"+resultGroupMap.get("profile").get("dn");
+                    resultMap.put(key,nativeIdentityDetails.get(eachUserMap.get("id")));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return resultMap;
+    }
+  }
+
+  Map getEmailsOfUsers(Map applicationUsers,String baseUrl,String auth){
+    String customName = "Custom-Use_It_Or_Lose_It_Configuration";
+    Custom userItOrLoseitCustom = context.getObjectByName(Custom.class,customName);
+    if(null != userItOrLoseitCustom){
+      Attributes attributes = userItOrLoseitCustom.getAttributes();
+      Map result = new HashMap();
+      for (Map.Entry entry : applicationUsers.entrySet()){
+        String actorId = (String)entry.getKey();
+        String fullUrl = baseUrl+attributes.get("Okta_Details").get("getSingleUserURL").toString()+actorId;
+        Object obj = callSingleAPI(auth, fullUrl);
+        Map resultMap = (Map)obj;
+        result.put(resultMap.get("profile").get("email").toString(),entry.getValue().toString());
+      }
+      return result;
+    }
+  }
+
+  String getEmailsOfUsers(String actorId,String baseUrl,String auth){
+    String customName = "Custom-Use_It_Or_Lose_It_Configuration";
+    Custom userItOrLoseitCustom = context.getObjectByName(Custom.class,customName);
+    if(null != userItOrLoseitCustom){
+      Attributes attributes = userItOrLoseitCustom.getAttributes();
+      Map result = new HashMap();
+      String fullUrl = baseUrl+attributes.get("Okta_Details").get("getSingleUserURL").toString()+actorId;
+      Object obj = callSingleAPI(auth, fullUrl);
+      Map resultMap = (Map)obj;
+      return resultMap.get("profile").get("email").toString();
+    }
+  }
+
+  String getAdNativeIdentityFromEmail(String email) {
+    String distinguishedName = "";
+    QueryOptions qo = new QueryOptions();
+    qo.add(Filter.and(Filter.ignoreCase(Filter.eq("identity.email",email)), Filter.eq("application.name", "Active Directory - TakDemo")));
+    // Application name needs to updated
+    Iterator linkItr = context.search(Link.class, qo, "nativeIdentity");
+    while (linkItr.hasNext()) {
+      distinguishedName = linkItr.next()[0];
+      break; // TODO: Handle Multiple AD Accounts
+    }
+    return distinguishedName;
+  }
+
+  Map getOktaDormentUsers(String applicationName,String scope) {
+    String customName = "Custom-Use_It_Or_Lose_It_Configuration";
+    Custom userItOrLoseitCustom = context.getObjectByName(Custom.class,customName);
+    if(null != userItOrLoseitCustom){
+      Attributes attributes = userItOrLoseitCustom.getAttributes();
+      String baseUrl = attributes.get("Okta_Details").get("baseUrl").toString();
+      applicationName = applicationName.replaceAll(" ","+");
+      String filter = attributes.get("Okta_Details").get("logsPreFilter").toString()+applicationName+attributes.get("Okta_Details").get("logsPostFilter").toString();
+      String auth = "";
+
+      auth = attributes.get("Okta_Details").get("oktaAuth").toString();
+
+      //Converting Varibles according to API calls
+      if(scope.equalsIgnoreCase("Account")){
+        scope = "USER";
+      }
+      else if(scope.equalsIgnoreCase("Access")){
+        scope = "GROUP";
+      }
+      else{
+        scope = "USER";
+      }
+
+      //Returning Full Data for Mentioned Application
+      Object resultObejct = callListAPI(auth,baseUrl+filter);
+      
+      //Filtering Data to get UserID and last login date of the User
+      Map nativeIdentityDetails = processApplicationData(resultObejct);
+
+      Map applicationUsers = (Map)getAllUsersforApplication(nativeIdentityDetails,baseUrl,auth,scope);
+     // log.error("Print finalResult sscope value :::"+ scope);
+      if(scope.equalsIgnoreCase("USER")){
+        Map finalResult = (Map)getEmailsOfUsers(applicationUsers,baseUrl,auth);
+        //log.error(" Print finalResult :::"+ finalResult);
+        log.error("Rule-Okta-Inactive-Accounts, returning finalResult: "+finalResult);
+        return finalResult;
+      }
+      return applicationUsers;
+    }
+  }
+
+  log.error("Starting rule Rule-Okta-Inactive-Accounts");
+  try{
+  return getOktaDormentUsers("HC SIT","Access"); 
+   return getOktaDormentUsers(application,objectType);
+  }
+  catch(Exception e){
+    log.error("Caught exception", e);
+  }
+  </Source>
+</Rule>

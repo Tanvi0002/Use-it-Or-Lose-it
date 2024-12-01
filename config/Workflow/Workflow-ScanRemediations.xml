@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Scan Remediations">
+  <Variable name="listOfItems" output="true"/>
+  <Variable initializer="true" name="trace"/>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Manage Remediations Rule Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="Get Remediations"/>
+  </Step>
+  <Step icon="Task" name="Get Remediations" posX="164" posY="16">
+    <Script>
+      <Source>
+     
+        workflow.put("listOfItems",getListOfItems());
+        log.error("In workflow: list of items: "+getListOfItems());
+       
+      </Source>
+    </Script>
+    <Transition to="Perform Remediations"/>
+  </Step>
+  <Step background="true" icon="Default" name="Perform Remediations" posX="336" posY="69">
+    <Replicator arg="item" items="listOfItems"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Perform Remediations"/>
+    </WorkflowRef>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="469" posY="20"/>
+</Workflow>

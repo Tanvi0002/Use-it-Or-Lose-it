@@ -1,0 +1,211 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="Custom-Use_It_Or_Lose_It_Configuration">
+  <Attributes>
+    <Map>
+      <entry key="Okta_Details">
+        <value>
+          <Map>
+            <entry key="baseUrl" value="https://deloittepreview.oktapreview.com/"/>
+            <entry key="getAllUserForApplicationPostURL" value="/users"/>
+            <entry key="getAllUserForApplicationPreURL" value="api/v1/apps/"/>
+            <entry key="getSingleUserURL" value="/api/v1/users/"/>
+            <entry key="logsPostFilter" value="%22+and+outcome.result+eq+%22SUCCESS%22&amp;sortOrder=DESCENDING"/>
+            <entry key="logsPreFilter" value="api/v1/logs?filter=target.displayName+eq+%22"/>
+            <entry key="oktaAuth" value="0097aShc1NHxrZ-2cT4eL0wGpRap1HVAIbU9Mwi434"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="Splunk_Details">
+        <value>
+          <Map>
+            <entry key="Max_tries" value="10"/>
+            <entry key="Sleep_count" value="2000"/>
+            <entry key="Splunk_access_query" value="search index=* sourcetype=Splunk_Test | search last_login!=null entitlement_attribute!=null entitlement_value!=null  Application_name!=null | table userid entitlement_attribute entitlement_value last_login Application_name"/>
+            <entry key="Splunk_account_query" value="search index=* sourcetype=Splunk_Test |search last_login!=null Application_name!=null  userid!=null | table userid last_login"/>
+            <entry key="baseUrl" value="https://localhost:8089/services/search/jobs"/>
+            <entry key="password" value="timeisMoney@100"/>
+            <entry key="username" value="alpha"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="defaultDelimiter" value=";"/>
+      <entry key="dormantAccess">
+        <value>
+          <Map>
+            <entry key="applicationRule">
+              <value>
+                <Map>
+                  <entry key="HC SIT" value="Rule-Okta-Inactive-Accounts"/>
+                  <entry key="Immuta" value="Org-Rule-Access-Dormant_Access_Remediation"/>
+                  <entry key="Splunk-App" value="Rule-Splunk-lastlogin-Account"/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="applicationSchemaAttribute">
+              <value>
+                <Map>
+                  <entry key="FinServ" value="ACCESSTYPE_LAST_LOGIN"/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="defaultDataSource" value="applicationSchemaAttribute"/>
+            <entry key="feedFile">
+              <value>
+                <Map>
+                  <entry key="application_name_3" value="file_path_1"/>
+                  <entry key="application_name_4">
+                    <value>
+                      <Map>
+                        <entry key="customizationRule" value="Org-Rule-&lt;Application_Name&gt;-Dormant_Access_PreIterate"/>
+                        <entry key="filePath" value="file_path_2"/>
+                      </Map>
+                    </value>
+                  </entry>
+                </Map>
+              </value>
+            </entry>
+            <entry key="remediationAction">
+              <value>
+                <Map>
+                  <entry key="remove">
+                    <value>
+                      <Map>
+                        <entry key="approvalMode" value="serial"/>
+                        <entry key="approvalScheme" value="none"/>
+                        <entry key="approvingIdentities" value="&lt;identity or workgroup name here&gt;"/>
+                        <entry key="customAuditAction" value="Org_Dormant_Access_Remediation_Remove"/>
+                        <entry key="maxThresholdInDays" value="150"/>
+                        <entry key="reminderDaysBeforeMaxThreshold" value="5,3,1"/>
+                        <entry key="reminderEmailTemplate" value="Org-EmailTemplate-Dormant_Access_Reminder_Notification"/>
+                        <entry key="securityOfficerName" value="&lt;security officer identity name here&gt;"/>
+                      </Map>
+                    </value>
+                  </entry>
+                </Map>
+              </value>
+            </entry>
+            <entry key="siemEventCollector">
+              <value>
+                <Map>
+                  <entry key="application_name_5" value="&lt;query_param or filter (eg. channel ID or something similar) to uniquely fetch access last usage information of application_name_5 from SIEM tool&gt;"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="dormantAccount">
+        <value>
+          <Map>
+            <entry key="applicationRule">
+              <value>
+                <Map>
+                  <entry key="HC SIT" value="Rule-Okta-Inactive-Accounts"/>
+                  <entry key="Salesforce-PingOne" value="Rule-Ping-Inactive-Accounts"/>
+                  <entry key="Splunk-App" value="Rule-Splunk-lastlogin-Account"/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="applicationSchemaAttribute">
+              <value>
+                <Map>
+                  <entry key="FinServ" value="LAST_LOGIN"/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="defaultDataSource" value="applicationSchemaAttribute"/>
+            <entry key="feedFile">
+              <value>
+                <Map>
+                  <entry key="Employees">
+                    <value>
+                      <Map>
+                        <entry key="customizationRule" value="Org-Rule-Finance-Dormant_Account_Remediation"/>
+                        <entry key="delimiter" value=","/>
+                        <entry key="filePath" value="C:\\Use_It\\FilePath-Customize.csv"/>
+                      </Map>
+                    </value>
+                  </entry>
+                  <entry key="Employees1" value="C:\\Use_It\\FilePath.csv"/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="remediationAction">
+              <value>
+                <Map>
+                  <entry key="HC SIT" value="disable"/>
+                  <entry key="Salesforce-PingOne" value="disable"/>
+                  <entry key="Splunk-App" value="disable"/>
+                  <entry key="defaultMaxThresholdInDays" value="150"/>
+                  <entry key="defaultRemediationAction" value="disable"/>
+                  <entry key="delete">
+                    <value>
+                      <Map>
+                        <entry key="approvalMode" value="serial"/>
+                        <entry key="approvalScheme" value="none"/>
+                        <entry key="approvingIdentities" value="&lt;identity or workgroup name here&gt;"/>
+                        <entry key="customAuditAction" value="Org_Dormant_Account_Remediation_Delete"/>
+                        <entry key="isRemediationReversalSupported" value="true"/>
+                        <entry key="maxThresholdInDays" value="150"/>
+                        <entry key="reminderDaysBeforeMaxThreshold" value="1"/>
+                        <entry key="reminderEmailTemplate" value="Org-EmailTemplate-Dormant_Account_Reminder_Notification"/>
+                        <entry key="securityOfficerName" value="&lt;security officer identity name here&gt;"/>
+                      </Map>
+                    </value>
+                  </entry>
+                  <entry key="disable">
+                    <value>
+                      <Map>
+                        <entry key="approvalMode" value="serial"/>
+                        <entry key="approvalScheme" value="none"/>
+                        <entry key="approvingIdentities" value="&lt;identity or workgroup name here&gt;"/>
+                        <entry key="customAuditAction" value="Org_Dormant_Account_Remediation_Disable"/>
+                        <entry key="maxThresholdInDays" value="150"/>
+                        <entry key="reminderDaysBeforeMaxThreshold" value="1"/>
+                        <entry key="reminderEmailTemplate" value="Org-EmailTemplate-Dormant_Account_Reminder_Notification"/>
+                        <entry key="securityOfficerName" value="&lt;security officer identity name here&gt;"/>
+                      </Map>
+                    </value>
+                  </entry>
+                </Map>
+              </value>
+            </entry>
+            <entry key="siemEventCollector">
+              <value>
+                <Map>
+                  <entry key="application_name_5" value="&lt;query_param or filter (eg. channel ID or something similar) to uniquely fetch account last usage information of application_name_5 from SIEM tool&gt;"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="isRemediationReversalSupported" value="true"/>
+      <entry key="lastUsageDateFormat">
+        <value>
+          <Map>
+            <entry key="Amazon Web Services" value="MMM dd, yyyy, hh:mm:ss a"/>
+            <entry key="Finance" value="dd/MM/yyyy"/>
+            <entry key="default" value="MM/dd/yyyy"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="ping_configuration">
+        <value>
+          <Map>
+            <entry key="admin_environment_id" value="5a8933f7-61c6-46fe-a9f0-467851a2e045"/>
+            <entry key="base_api_url" value="https://api.pingone.ca/"/>
+            <entry key="base_auth_url" value="https://auth.pingone.ca/"/>
+            <entry key="client_id" value="6e51d2cd-ac31-4387-b085-6f54eff0b658"/>
+            <entry key="client_secret" value="KfRO02K5p44eGYAjeD4nV3HJfyeIH2mTaU~YZMj1T~E5zUKux8RATD2k0rSBjONe"/>
+            <entry key="max_retry" value="10"/>
+            <entry key="retry_threshold" value="10"/>
+            <entry key="worker_environment_id" value="f7af59f6-91d1-4b94-b031-51ccffd60b49"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="remediationLogAccess" value="1:ACP:kpzkOvYWIPZE/Lf7lXPbzquEoX5557Amy4VOBUxaHx0="/>
+    </Map>
+  </Attributes>
+</Custom>

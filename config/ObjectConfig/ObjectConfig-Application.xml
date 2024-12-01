@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE ObjectConfig PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<ObjectConfig name="Application">
+  <ObjectAttribute editMode="Permanent" extendedNumber="1" name="dormantCheck">
+    <AllowedValues>
+      <String>Dormant Account and Access</String>
+      <String>Dormant Account</String>
+      <String>None</String>
+    </AllowedValues>
+  </ObjectAttribute>
+</ObjectConfig>

@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition created="1727263219623" id="c0a81d1292281c06819228e91fa6003d" modified="1731578683622" name="Perform Remediation Task" resultAction="Delete" significantModified="1731578683622" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="1"/>
+      <entry key="TaskDefinition.runLengthTotal" value="81"/>
+      <entry key="TaskDefinition.runs" value="58"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="ruleName" value="Perform Remediations Workflow Launcher Rule"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+    </Map>
+  </Attributes>
+  <Description>A task that can be used to run an arbitrary rule.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" id="c0a81d1292281d8e819228ce3b2b00ff" name="spadmin"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" id="c0a81d1292281d8e819228ce7abc01e1" name="Run Rule"/>
+  </Parent>
+</TaskDefinition>

@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Prepare Remediations">
+  <Description>Fetch and store all identity remediation information for all those applications whose extended attributes have specified values within a custom object, and call the remediation subprocess for each remediation</Description>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Manage Remediations Rule Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="Populate Dormant Accounts"/>
+  </Step>
+  <Step action="script: prepareDataForDormantAccount()" icon="Task" name="Populate Dormant Accounts" posX="296" posY="10" resultVariable="addCount">
+    <Transition to="Populate Dormant Accesses"/>
+  </Step>
+  <Step action="script: prepareDataForDormantAccess()" icon="Task" name="Populate Dormant Accesses" posX="296" posY="10" resultVariable="addCount">
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="526" posY="10"/>
+</Workflow>

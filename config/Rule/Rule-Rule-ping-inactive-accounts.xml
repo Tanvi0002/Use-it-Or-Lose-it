@@ -1,0 +1,265 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Rule-Ping-Inactive-Accounts">
+  <Source>
+  import sailpoint.object.Application;
+  import sailpoint.api.SailPointContext; 
+  import org.apache.http.message.BasicNameValuePair;
+  import org.apache.http.util.EntityUtils; 
+  import org.apache.commons.codec.binary.Base64;
+  import org.json.simple.JSONObject;
+  import org.json.simple.parser.JSONParser;
+  import org.json.simple.parser.ParseException;
+  import org.apache.commons.lang3.StringUtils;
+  import sailpoint.server.Auditor;
+  import java.util.HashMap;
+  import java.util.Map;
+  import sailpoint.object.Attributes;
+  import org.apache.http.HttpResponse;
+  import org.apache.http.client.methods.HttpDelete;
+  import org.apache.http.client.methods.HttpGet;
+  import org.apache.http.client.methods.HttpPost;
+  import org.apache.http.client.methods.HttpPut;  
+  import org.apache.http.client.HttpClient;
+  import org.apache.http.impl.client.DefaultHttpClient;
+  import org.apache.http.client.utils.URLEncodedUtils;
+  import org.apache.log4j.Logger;
+  import java.util.*;
+  import org.json.simple.parser.JSONParser;
+  import sailpoint.integration.JsonUtil;
+  import java.net.URLEncoder;
+  import java.nio.charset.StandardCharsets;
+  import org.apache.http.client.entity.UrlEncodedFormEntity;
+  import com.sun.net.httpserver.HttpContext;
+  import com.sun.net.httpserver.HttpContext;
+  import javax.xml.ws.spi.http.HttpContext;
+  import org.apache.http.impl.client.BasicCookieStore;
+  import org.apache.http.*;
+  import org.apache.http.entity.StringEntity;
+  import org.apache.http.client.methods.*;
+  import org.apache.http.impl.client.*;
+  import org.apache.http.util.*;
+  import org.apache.http.message.*;
+  import org.apache.http.client.entity.*;
+  import org.json.JSONObject;
+  import org.json.simple.parser.JSONParser;
+  import sailpoint.integration.JsonUtil;
+  import org.apache.http.HttpResponse;
+  import org.apache.http.client.methods.CloseableHttpResponse;
+  import org.apache.http.client.methods.HttpPost;
+  import org.apache.http.entity.StringEntity;
+  import org.apache.http.impl.client.CloseableHttpClient;
+  import org.apache.http.impl.client.HttpClients;
+  import org.apache.http.util.EntityUtils;
+  import org.apache.http.client.utils.URLEncodedUtils;
+  import org.apache.http.NameValuePair;
+  import org.apache.http.message.BasicNameValuePair;
+  import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+  import org.apache.http.conn.ssl.NoopHostnameVerifier;
+  import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+  import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+  import org.apache.http.conn.ssl.SSLContexts;
+  import org.apache.http.impl.client.HttpComponentsClientHttpRequestFactory;
+  import org.springframework.http.client.ClientHttpRequestFactory;
+  import java.nio.charset.StandardCharsets;
+  import java.security.NoSuchAlgorithmException;
+  import java.security.KeyManagementException;
+  import java.security.KeyStoreException;
+  import java.util.ArrayList;
+  import java.util.List;
+  import java.util.Base64;
+  import javax.net.ssl.SSLContext;
+  import org.json.simple.parser.JSONParser;
+  import sailpoint.integration.JsonUtil;
+  import org.json.*;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Util;
+  import org.apache.http.HttpEntity;
+  import java.time.ZonedDateTime;
+  import java.time.format.DateTimeFormatter;
+  import sailpoint.object.Custom;
+
+
+  String logger = "UseItOrLoseIt: Ping ==&gt; ";
+  log.info(logger+"Entering Ping API Rule");
+
+  String customName = "Custom-Use_It_Or_Lose_It_Configuration";
+  Custom userItOrLoseitCustom = context.getObjectByName(Custom.class,customName);
+  Map pingDetails = null;
+
+  if(null != userItOrLoseitCustom){
+    Attributes attributes = userItOrLoseitCustom.getAttributes();
+    pingDetails = attributes.get("ping_configuration");
+  }
+
+  public String basePath= pingDetails.get("base_auth_url"); // Base URL
+    public String baseapiPath= pingDetails.get("base_api_url"); // Base URL
+
+  public String clientId=  pingDetails.get("client_id"); //Client ID
+  public String clientSecret=  pingDetails.get("client_secret");; //Client Secret
+  public String adminEnvrID=  pingDetails.get("admin_environment_id"); //admin Environment ID
+  public String workerEnvrID=  pingDetails.get("worker_environment_id"); //worker Environment ID
+  public String max_retry=  pingDetails.get("max_retry"); //max_retry
+  public String retry_threshold=  pingDetails.get("retry_threshold"); //retry_threshold
+
+  public String defaultFailureReason = "Failure : Ping API not working"; // default error message
+  public String authToken = null;
+  public String failureReason = null;
+  String applicationName = "Salesforce SSO";
+
+  HttpClient httpClient = new DefaultHttpClient();
+
+  public String getMsgFromResponse(JSONObject jObject) {
+    log.error(logger+"getMsgFromResponse start");
+    String message = jObject.get("message");
+    if(null!=message){
+      return "Failure : " + message; 
+    }
+
+    message = jObject.get("error");
+    if(null!=message){
+      return "Failure : " + message; 
+    }
+    return defaultFailureReason;
+  }
+
+  public JSONObject returnJsonObj(HttpResponse response) {	
+    log.error(logger+"returnJSONObj start");
+    JSONObject jsonObject = null;
+    String responseString = EntityUtils.toString(response.getEntity());
+    if(responseString!=null &amp;&amp; responseString.startsWith("{")){
+      JSONParser jParser = new JSONParser();
+      jsonObject = (JSONObject) jParser.parse(responseString);
+    }
+    return jsonObject;
+  }
+
+  // Get Bearer Token
+  public String getAuthToken(String userName, String password) {
+    log.error(logger+"getAuthToken start");
+    String url = basePath + adminEnvrID +"/as/token";
+    CloseableHttpResponse response = null;
+    JSONObject jsonObject = null;
+    CloseableHttpClient httpClient = HttpClients.createDefault();
+    try{
+
+      List params = new ArrayList();
+      params.add(new BasicNameValuePair("output_mode", "json"));
+      params.add(new BasicNameValuePair("grant_type", "client_credentials"));
+
+      // Encode parameters for the POST request
+      String encodedParams = URLEncodedUtils.format(params, StandardCharsets.UTF_8);
+      String auth = userName + ":" + password;
+      String authHeader = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+      HttpPost postRequest = new HttpPost(url);
+      postRequest.setHeader("Authorization", authHeader);
+      postRequest.setHeader("Accept","application/json");
+      postRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
+      postRequest.setEntity(new StringEntity(encodedParams));
+
+      response = httpClient.execute(postRequest);      
+    } catch (Exception ex) {
+      log.error(logger+"Exception in getting Response(POST) from " + url + " : "+ex);
+    }
+
+    if(null!=response) {
+      HttpEntity getResponseEntity = response.getEntity();
+      if(response.getStatusLine().toString().contains("200") @and getResponseEntity!=null) {
+        jsonObject = new JSONObject(EntityUtils.toString(getResponseEntity));
+      }
+    }
+
+    if( null!=jsonObject &amp;&amp; jsonObject.getString("access_token")!=null )  {
+      //Correct Scenario
+      authToken = jsonObject.getString("access_token");
+      return authToken;
+    }
+    else if(null!=jsonObject ) {
+      failureReason = getMsgFromResponse(jsonObject);
+      return failureReason;
+    }
+    return defaultFailureReason;
+  }
+
+
+  //Get Audit Activites
+  public Object getAuditActivity(String workerEnvrID,String objectType) { 
+    log.error(logger+"getUserId start");
+    String url = baseapiPath + "v1/environments/" + workerEnvrID + "/activities";
+
+    HttpResponse response = null;
+    JSONObject jObject = null;
+    authToken= getAuthToken(clientId,clientSecret);
+    Map result = new HashMap();
+    Map resultAuditMap = new HashMap();
+
+    try{
+
+      HttpGet httpGet = new HttpGet(url);
+
+      if (authToken != null) {
+        httpGet.setHeader("Authorization", "Bearer " + authToken);
+      }
+      else{
+        log.error(logger+"Authorization Token is Null");
+        throw new GeneralException("Authorization Token is Null");
+      }
+
+      response = httpClient.execute(httpGet);
+
+    } catch (Exception ex) {
+      log.error(logger+"Exception in getting Response(GET) from " + url + " : "+ex);
+    }
+
+    //  return response.toString();
+    if(null!=response) {
+      HttpEntity getResponseEntity = response.getEntity();
+      if(response.getStatusLine().toString().contains("200") @and getResponseEntity!=null) {
+        resultAuditMap = (Map)JsonUtil.parse(EntityUtils.toString(getResponseEntity));
+      }
+    }
+
+    List arrList = resultAuditMap.get("_embedded").get("activities");
+
+    Map actionMap = new HashMap();
+    Map actorsMap = new HashMap();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+    for(Map map:arrList){
+      if(map!= null &amp;&amp; map.get("actors") != null ){
+        actionMap = map.get("action"); 
+        actorsMap = map.get("actors"); 
+
+
+        if(objectType.equalsIgnoreCase("Account") @and actionMap!=null @and actionMap.get("description")!=null @and actionMap.get("description").equalsIgnoreCase("Sign-on flow finished") @and  actionMap.get("type").equalsIgnoreCase("FLOW.DELETED") @and actorsMap.get("client").get("name").equalsIgnoreCase(applicationName) @and map.get("result").get("status").equalsIgnoreCase("SUCCESS")){
+          String key = actorsMap.get("user").get("name").toString();
+          ZonedDateTime zone = ZonedDateTime.parse(map.get("recordedAt").toString());
+          DateTimeFormatter  = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+          String value = zone.format(formatter);
+          result.put(key, value );
+        }
+
+        if(objectType.equalsIgnoreCase("Access") @and actionMap!=null @and actionMap.get("description")!=null @and actionMap.get("description").equalsIgnoreCase("USER.ACCESS_ALLOWED") @and  actionMap.get("type").equalsIgnoreCase("GROUP") @and map.get("result").get("status").equalsIgnoreCase("SUCCESS")){
+          String key = actorsMap.get("user").get("name").toString() +"##memeberOf##"+ actorsMap.get("result").get("value").toString() ;  // NativeIdentity + ManagedAttribute  EntitlementValue
+          ZonedDateTime zone = ZonedDateTime.parse(map.get("recordedAt").toString());
+          String value = zone.format(formatter);
+          result.put(key,value );
+        }
+      }
+    }
+    result.put("abhishekgupta77@deloitte.com","03/26/2024");
+    result.put("varuntiwari@deloitte.com","09/15/2024");
+    
+    return result;
+  }
+
+
+///  return getAuthToken(clientId,clientSecret);
+  String objectType = "Account";   // Account/Access
+
+  return  getAuditActivity(workerEnvrID,objectType); ;
+
+  log.info(logger+"Entering Ping API Rule");
+
+  </Source>
+</Rule>
