@@ -12,7 +12,7 @@
             <entry key="getSingleUserURL" value="/api/v1/users/"/>
             <entry key="logsPostFilter" value="%22+and+outcome.result+eq+%22SUCCESS%22&amp;sortOrder=DESCENDING"/>
             <entry key="logsPreFilter" value="api/v1/logs?filter=target.displayName+eq+%22"/>
-            <entry key="oktaAuth" value="0097aShc1NHxrZ-2cT4eL0wGpRap1HVAIbU9Mwi434"/>
+            <entry key="oktaAuth" value=""/>
           </Map>
         </value>
       </entry>
